@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "TheMatrix.jpg",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
