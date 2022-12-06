@@ -9,6 +9,9 @@ import UIKit
 
 class AddMovieCollectionViewCell: UICollectionViewCell {
     
+    
+    let identifier = CellIdentifiers.AddMovieCollectionViewCell.rawValue
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         

@@ -22,15 +22,14 @@ class MovieDetailsViewController: UIViewController {
     }
     
     @objc func editMovie() {
-//        let editMovieViewController = EditMovieViewController(nibName: "EditMovieViewController", bundle: nil)
-//        editMovieViewController.title = "Edit"
-//
-//        navigationController?.pushViewController(editMovieViewController, animated: true)
         
         let editMovieViewController = CreateMovieViewController(nibName: "CreateMovieViewController", bundle: nil)
         editMovieViewController.title = "Edit"
+//        editMovieViewController.btnTitle = "Edit Movie"
+        editMovieViewController.isEditMode = true
         
         navigationController?.pushViewController(editMovieViewController, animated: true)
+        
     }
     
     @objc func didTapCancelBtn() {

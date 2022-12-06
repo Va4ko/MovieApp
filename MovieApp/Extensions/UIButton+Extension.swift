@@ -9,10 +9,9 @@ import UIKit
 
 extension UIButton {
     func setBtnUI() {
-        let btn = self
-        btn.layer.cornerRadius = 15
-        btn.backgroundColor = UIColor(named: "IntroScreenBtnColor")
-        btn.setTitleColor(UIColor.white, for: .normal)
-        btn.setTitleColor(UIColor.purple, for: .highlighted)
+        layer.cornerRadius = 15
+        backgroundColor = UIColor(named: "IntroScreenBtnColor")
+        setTitleColor(UIColor.white, for: .normal)
+        setTitleColor(UIColor.purple, for: .highlighted)
     }
 }

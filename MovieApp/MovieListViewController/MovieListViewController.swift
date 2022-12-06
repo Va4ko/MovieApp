@@ -9,12 +9,19 @@ import UIKit
 
 private let reuseIdentifier = "MovieCell"
 
-private enum CellIdentifiers: String {
+enum CellIdentifiers: String {
     case MovieCollectionViewCell = "MovieCollectionViewCell"
     case AddMovieCollectionViewCell = "AddMovieCollectionViewCell"
 }
 
 class MovieListViewController: UICollectionViewController {
+    
+    let image = UIImage(named: "Avatar")
+    let image2 = UIImage(named: "TheMatrix")
+    let image3 = UIImage(named: "StarWars")
+    
+    var images: [UIImage] = []
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +36,8 @@ class MovieListViewController: UICollectionViewController {
         
         setCollectionViewLayout()
         
+        images = [image!, image2!, image3!, image!, image2!]
+        
     }
     
     func setCollectionViewLayout() {
@@ -40,11 +49,15 @@ class MovieListViewController: UICollectionViewController {
         layout.sectionInset = UIEdgeInsets(top: 5, left: 10, bottom: 5, right: 10)
         
         collectionView.collectionViewLayout = layout
+        
     }
+    
+    
     
     @objc func addMovie() {
         let createMovieViewController = CreateMovieViewController(nibName: "CreateMovieViewController", bundle: nil)
         createMovieViewController.title = "Add"
+        createMovieViewController.btnTitle = "Add Movie"
         
         let navigationController = UINavigationController(rootViewController: createMovieViewController)
         present(navigationController, animated: true)
@@ -57,21 +70,53 @@ class MovieListViewController: UICollectionViewController {
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if indexPath.item == images.count {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.AddMovieCollectionViewCell.rawValue, for: indexPath) as! AddMovieCollectionViewCell
+            return cell
+        } else {
+            let imagee = images[indexPath.item]
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.MovieCollectionViewCell.rawValue, for: indexPath) as! MovieCollectionViewCell
+                    cell.moviePoster.image = imagee
+            return cell
+        }
         
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.AddMovieCollectionViewCell.rawValue, for: indexPath)
-        //        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.MovieCollectionViewCell.rawValue, for: indexPath)
         
         
-        return cell
+        
+        
+        
+        
+//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.AddMovieCollectionViewCell.rawValue, for: indexPath)
+//                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.MovieCollectionViewCell.rawValue, for: indexPath)
+        //////
+//        let imagee = images[indexPath.item]
+////
+//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.MovieCollectionViewCell.rawValue, for: indexPath) as! MovieCollectionViewCell
+//        cell.moviePoster.image = imagee
+        
+        
+        
+//        return cell
     }
     
     // MARK: UICollectionViewDelegate
     
     override func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let movieDetailsViewController = MovieDetailsViewController(nibName: "MovieDetailsViewController", bundle: nil)
-        movieDetailsViewController.title = "Details \(indexPath.item)"
-        let navigationController = UINavigationController(rootViewController: movieDetailsViewController)
-        present(navigationController, animated: true)
+        
+        if collectionView.cellForItem(at: indexPath) is AddMovieCollectionViewCell {
+            addMovie()
+        } else {
+                    let movieDetailsViewController = MovieDetailsViewController(nibName: "MovieDetailsViewController", bundle: nil)
+                    movieDetailsViewController.title = "Details \(indexPath.item)"
+                    let navigationController = UINavigationController(rootViewController: movieDetailsViewController)
+                    present(navigationController, animated: true)
+        }
+        
+        
+//        let movieDetailsViewController = MovieDetailsViewController(nibName: "MovieDetailsViewController", bundle: nil)
+//        movieDetailsViewController.title = "Details \(indexPath.item)"
+//        let navigationController = UINavigationController(rootViewController: movieDetailsViewController)
+//        present(navigationController, animated: true)
     }
     
     

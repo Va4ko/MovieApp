@@ -27,6 +27,13 @@
 		427EC943293BFD110098427B /* MovieCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 427EC941293BFD110098427B /* MovieCollectionViewCell.xib */; };
 		427EC946293BFD280098427B /* AddMovieCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 427EC944293BFD280098427B /* AddMovieCollectionViewCell.swift */; };
 		427EC947293BFD280098427B /* AddMovieCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 427EC945293BFD280098427B /* AddMovieCollectionViewCell.xib */; };
+		42EA5199293E3AE000052B3C /* CoreDataHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA5198293E3AE000052B3C /* CoreDataHelper.swift */; };
+		42EA519C293E3CEF00052B3C /* Movie+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA519A293E3CEF00052B3C /* Movie+CoreDataClass.swift */; };
+		42EA519D293E3CEF00052B3C /* Movie+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA519B293E3CEF00052B3C /* Movie+CoreDataProperties.swift */; };
+		42EA519F293F22F700052B3C /* UITextField+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA519E293F22F700052B3C /* UITextField+Extension.swift */; };
+		42EA51A1293F24BF00052B3C /* UITextView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA51A0293F24BF00052B3C /* UITextView+Extension.swift */; };
+		42EA51A3293F3A8A00052B3C /* UIViewController+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA51A2293F3A8A00052B3C /* UIViewController+Extension.swift */; };
+		42EA51A6293F63C600052B3C /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42EA51A5293F63C600052B3C /* Utils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +59,13 @@
 		427EC941293BFD110098427B /* MovieCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MovieCollectionViewCell.xib; sourceTree = "<group>"; };
 		427EC944293BFD280098427B /* AddMovieCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMovieCollectionViewCell.swift; sourceTree = "<group>"; };
 		427EC945293BFD280098427B /* AddMovieCollectionViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AddMovieCollectionViewCell.xib; sourceTree = "<group>"; };
+		42EA5198293E3AE000052B3C /* CoreDataHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataHelper.swift; sourceTree = "<group>"; };
+		42EA519A293E3CEF00052B3C /* Movie+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Movie+CoreDataClass.swift"; sourceTree = "<group>"; };
+		42EA519B293E3CEF00052B3C /* Movie+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Movie+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		42EA519E293F22F700052B3C /* UITextField+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextField+Extension.swift"; sourceTree = "<group>"; };
+		42EA51A0293F24BF00052B3C /* UITextView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITextView+Extension.swift"; sourceTree = "<group>"; };
+		42EA51A2293F3A8A00052B3C /* UIViewController+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extension.swift"; sourceTree = "<group>"; };
+		42EA51A5293F63C600052B3C /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -68,6 +82,8 @@
 		427EC8FB2939EDC40098427B = {
 			isa = PBXGroup;
 			children = (
+				42EA519A293E3CEF00052B3C /* Movie+CoreDataClass.swift */,
+				42EA519B293E3CEF00052B3C /* Movie+CoreDataProperties.swift */,
 				427EC9062939EDC40098427B /* MovieApp */,
 				427EC9052939EDC40098427B /* Products */,
 			);
@@ -91,6 +107,8 @@
 				427EC935293A4BF10098427B /* EditMovieViewController */,
 				427EC93F293BFCC40098427B /* CustomCollectionViewCells */,
 				427EC91E293A0C020098427B /* Extensions */,
+				42EA5197293E3AB500052B3C /* CoreDataHelper */,
+				42EA51A4293F63AE00052B3C /* Utils */,
 				427EC9072939EDC40098427B /* AppDelegate.swift */,
 				427EC9092939EDC40098427B /* SceneDelegate.swift */,
 				427EC90D2939EDC40098427B /* Main.storyboard */,
@@ -106,6 +124,9 @@
 			isa = PBXGroup;
 			children = (
 				427EC923293A10370098427B /* UIButton+Extension.swift */,
+				42EA519E293F22F700052B3C /* UITextField+Extension.swift */,
+				42EA51A0293F24BF00052B3C /* UITextView+Extension.swift */,
+				42EA51A2293F3A8A00052B3C /* UIViewController+Extension.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -163,6 +184,22 @@
 				427EC945293BFD280098427B /* AddMovieCollectionViewCell.xib */,
 			);
 			path = CustomCollectionViewCells;
+			sourceTree = "<group>";
+		};
+		42EA5197293E3AB500052B3C /* CoreDataHelper */ = {
+			isa = PBXGroup;
+			children = (
+				42EA5198293E3AE000052B3C /* CoreDataHelper.swift */,
+			);
+			path = CoreDataHelper;
+			sourceTree = "<group>";
+		};
+		42EA51A4293F63AE00052B3C /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				42EA51A5293F63C600052B3C /* Utils.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -242,16 +279,23 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				42EA519F293F22F700052B3C /* UITextField+Extension.swift in Sources */,
 				427EC933293A36F60098427B /* MovieDetailsViewController.swift in Sources */,
 				427EC924293A10370098427B /* UIButton+Extension.swift in Sources */,
 				427EC90C2939EDC40098427B /* IntroScreenViewController.swift in Sources */,
+				42EA51A3293F3A8A00052B3C /* UIViewController+Extension.swift in Sources */,
 				427EC92E293A29340098427B /* CreateMovieViewController.swift in Sources */,
 				427EC9082939EDC40098427B /* AppDelegate.swift in Sources */,
+				42EA519C293E3CEF00052B3C /* Movie+CoreDataClass.swift in Sources */,
 				427EC929293A274D0098427B /* MovieListViewController.swift in Sources */,
+				42EA5199293E3AE000052B3C /* CoreDataHelper.swift in Sources */,
 				427EC938293A4C160098427B /* EditMovieViewController.swift in Sources */,
+				42EA51A6293F63C600052B3C /* Utils.swift in Sources */,
 				427EC942293BFD110098427B /* MovieCollectionViewCell.swift in Sources */,
+				42EA51A1293F24BF00052B3C /* UITextView+Extension.swift in Sources */,
 				427EC9122939EDC40098427B /* MovieApp.xcdatamodeld in Sources */,
 				427EC946293BFD280098427B /* AddMovieCollectionViewCell.swift in Sources */,
+				42EA519D293E3CEF00052B3C /* Movie+CoreDataProperties.swift in Sources */,
 				427EC90A2939EDC40098427B /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
