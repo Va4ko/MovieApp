@@ -7,7 +7,9 @@
 
 import UIKit
 
-private let reuseIdentifier = "MovieCell"
+protocol MovieDetailsDelegate: AnyObject {
+    func movieData(movie: Movie)
+}
 
 enum CellIdentifiers: String {
     case MovieCollectionViewCell = "MovieCollectionViewCell"
@@ -16,28 +18,29 @@ enum CellIdentifiers: String {
 
 class MovieListViewController: UICollectionViewController {
     
-    let image = UIImage(named: "Avatar")
-    let image2 = UIImage(named: "TheMatrix")
-    let image3 = UIImage(named: "StarWars")
+    private var movies: [Movie] = []
     
-    var images: [UIImage] = []
-    
+    weak var movieDelegate: MovieDetailsDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addMovie))
+        
+        registerCells()
+        
+        setCollectionViewLayout()
+        
+        getMovies()
+        
+    }
+    
+    private func registerCells() {
         let addMovieCollectionCell = UINib(nibName: CellIdentifiers.AddMovieCollectionViewCell.rawValue, bundle: nil)
         collectionView.register(addMovieCollectionCell, forCellWithReuseIdentifier: CellIdentifiers.AddMovieCollectionViewCell.rawValue)
         
         let movieCollectionCell = UINib(nibName: CellIdentifiers.MovieCollectionViewCell.rawValue, bundle: nil)
         collectionView.register(movieCollectionCell, forCellWithReuseIdentifier: CellIdentifiers.MovieCollectionViewCell.rawValue)
-        
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addMovie))
-        
-        setCollectionViewLayout()
-        
-        images = [image!, image2!, image3!, image!, image2!]
-        
     }
     
     func setCollectionViewLayout() {
@@ -52,51 +55,43 @@ class MovieListViewController: UICollectionViewController {
         
     }
     
-    
+    private func getMovies() {
+        movies = CoreDataManager.shared.fetchMovies()
+    }
     
     @objc func addMovie() {
         let createMovieViewController = CreateMovieViewController(nibName: "CreateMovieViewController", bundle: nil)
-        createMovieViewController.title = "Add"
-        createMovieViewController.btnTitle = "Add Movie"
         
         let navigationController = UINavigationController(rootViewController: createMovieViewController)
         present(navigationController, animated: true)
+        
+        createMovieViewController.isDismissed = { [weak self] in
+            self?.movies = CoreDataManager.shared.fetchMovies()
+            self?.collectionView.reloadData()
+        }
     }
     
     // MARK: UICollectionViewDataSource
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 6
+        return movies.count + 1
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if indexPath.item == images.count {
+        
+        if movies.isEmpty {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.AddMovieCollectionViewCell.rawValue, for: indexPath) as! AddMovieCollectionViewCell
+            return cell
+        } else if indexPath.item == movies.count {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.AddMovieCollectionViewCell.rawValue, for: indexPath) as! AddMovieCollectionViewCell
             return cell
         } else {
-            let imagee = images[indexPath.item]
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.MovieCollectionViewCell.rawValue, for: indexPath) as! MovieCollectionViewCell
-                    cell.moviePoster.image = imagee
+            let movie = movies[indexPath.item]
+            cell.configureCell(movie: movie)
             return cell
         }
         
-        
-        
-        
-        
-        
-        
-//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.AddMovieCollectionViewCell.rawValue, for: indexPath)
-//                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.MovieCollectionViewCell.rawValue, for: indexPath)
-        //////
-//        let imagee = images[indexPath.item]
-////
-//        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.MovieCollectionViewCell.rawValue, for: indexPath) as! MovieCollectionViewCell
-//        cell.moviePoster.image = imagee
-        
-        
-        
-//        return cell
     }
     
     // MARK: UICollectionViewDelegate
@@ -106,47 +101,19 @@ class MovieListViewController: UICollectionViewController {
         if collectionView.cellForItem(at: indexPath) is AddMovieCollectionViewCell {
             addMovie()
         } else {
-                    let movieDetailsViewController = MovieDetailsViewController(nibName: "MovieDetailsViewController", bundle: nil)
-                    movieDetailsViewController.title = "Details \(indexPath.item)"
-                    let navigationController = UINavigationController(rootViewController: movieDetailsViewController)
-                    present(navigationController, animated: true)
+            let movie = movies[indexPath.item]
+            let movieDetailsViewController = MovieDetailsViewController(nibName: "MovieDetailsViewController", bundle: nil)
+            movieDelegate = movieDetailsViewController
+            movieDelegate?.movieData(movie: movie)
+            let navigationController = UINavigationController(rootViewController: movieDetailsViewController)
+            present(navigationController, animated: true)
+            
+            movieDetailsViewController.isDismissed = { [weak self] in
+                self?.movies = CoreDataManager.shared.fetchMovies()
+                self?.collectionView.reloadData()
+            }
         }
         
-        
-//        let movieDetailsViewController = MovieDetailsViewController(nibName: "MovieDetailsViewController", bundle: nil)
-//        movieDetailsViewController.title = "Details \(indexPath.item)"
-//        let navigationController = UINavigationController(rootViewController: movieDetailsViewController)
-//        present(navigationController, animated: true)
     }
-    
-    
-    /*
-     // Uncomment this method to specify if the specified item should be highlighted during tracking
-     override func collectionView(_ collectionView: UICollectionView, shouldHighlightItemAt indexPath: IndexPath) -> Bool {
-     return true
-     }
-     */
-    
-    /*
-     // Uncomment this method to specify if the specified item should be selected
-     override func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
-     return true
-     }
-     */
-    
-    /*
-     // Uncomment these methods to specify if an action menu should be displayed for the specified item, and react to actions performed on the item
-     override func collectionView(_ collectionView: UICollectionView, shouldShowMenuForItemAt indexPath: IndexPath) -> Bool {
-     return false
-     }
-     
-     override func collectionView(_ collectionView: UICollectionView, canPerformAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) -> Bool {
-     return false
-     }
-     
-     override func collectionView(_ collectionView: UICollectionView, performAction action: Selector, forItemAt indexPath: IndexPath, withSender sender: Any?) {
-     
-     }
-     */
     
 }

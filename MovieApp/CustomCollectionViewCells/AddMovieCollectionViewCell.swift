@@ -9,9 +9,6 @@ import UIKit
 
 class AddMovieCollectionViewCell: UICollectionViewCell {
     
-    
-    let identifier = CellIdentifiers.AddMovieCollectionViewCell.rawValue
-    
     override func awakeFromNib() {
         super.awakeFromNib()
         
@@ -19,11 +16,9 @@ class AddMovieCollectionViewCell: UICollectionViewCell {
         
     }
     
-    func setCollectionViewCellUI() {
+    private func setCollectionViewCellUI() {
         backgroundColor = UIColor.darkGray
         layer.cornerRadius = 15
     }
-    
-    
     
 }

@@ -13,6 +13,7 @@ extension UITextView {
         layer.borderWidth = 1.0
         layer.borderColor = UIColor.lightGray.cgColor
         layer.masksToBounds = true
+        layer.backgroundColor = UIColor.white.cgColor
     }
     
     func isValid() -> Bool {

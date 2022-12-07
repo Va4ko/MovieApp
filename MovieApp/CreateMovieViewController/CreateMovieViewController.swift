@@ -20,34 +20,26 @@ class CreateMovieViewController: UIViewController {
     @IBOutlet weak var scrollView: UIScrollView!
     
     @IBAction func addSaveBtnTapped(_ sender: Any) {
-        if titleField.isMoreThanThree() && shortDescriptionField.isMoreThanThree() && longDescriptionField.isMoreThanTen() {
-            print("GOOD TO GO!")
-        } else {
-            
-            popAlert(message: "Title field and Short description field must contain more than 3 characters. Long description field must contain more than 10. Please review!") {
-                
-            }
-        }
+        validateFields() ? addMovie() : popAlert(message: Constants.AlertMessages.textFields, onComplete: {
+        })
     }
     
-    let genres = ["Action", "Fantasy", "Science fiction", "Thriller", "Drama"]
-    let posters = ["Avatar", "Batman", "Gladiator", "Interstellar", "LordOfTheRings", "OnceUponATimeInAmerica", "Shawshank", "StarWars", "TheGodfather", "TheMatrix"]
-    
-    var btnTitle: String = ""
     var keyboardRect: CGRect?
     var imagePicker: UIPickerView?
     var datePicker: UIDatePicker?
     var genrePicker: UIPickerView?
-    
     private var containerView: UIView!
     var isEditMode: Bool = false
+    var isDismissed: (() -> Void)?
+    
+    private var movie: Movie?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         NotificationCenter.default.addObserver(self, selector: #selector(handle(keyboardShowNotification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         
         setupUI()
+        
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -56,7 +48,9 @@ class CreateMovieViewController: UIViewController {
     }
     
     @objc private func closeBtnTapped() {
-        dismiss(animated: true, completion: nil)
+        dismiss(animated: true) {
+            
+        }
     }
     
     @objc private func posterTapped(tapGestureRecognizer: UITapGestureRecognizer) {
@@ -97,30 +91,54 @@ class CreateMovieViewController: UIViewController {
     @objc private func genreDoneBtnPressed() {
         
         guard let genrePicker else { return }
-        genreField.text = genres[genrePicker.selectedRow(inComponent: 0)]
+        //        genreField.text = genres[genrePicker.selectedRow(inComponent: 0)]
+        genreField.text = Constants.AddMovie.genres[genrePicker.selectedRow(inComponent: 0)]
         self.view.endEditing(true)
     }
     
     @objc private func posterDoneBtnPressed() {
         
         guard let imagePicker else { return }
-        poster.image = UIImage(named: "\(posters[imagePicker.selectedRow(inComponent: 0)])")
+        //        poster.image = UIImage(named: "\(posters[imagePicker.selectedRow(inComponent: 0)])")
+        poster.image = UIImage(named: "\(Constants.AddMovie.posters[imagePicker.selectedRow(inComponent: 0)])")
         self.view.endEditing(true)
     }
     
     private func setupUI() {
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(closeBtnTapped))
+        self.title = isEditMode ? Constants.Titles.createMovieViewControllerTitleEditMovie : Constants.Titles.createMovieViewControllerTitleAddMovie
+        
+        navigationItem.leftBarButtonItem = isEditMode ? nil : UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(closeBtnTapped))
         
         hideKeyboardWhenTappedAround()
         
         AddSaveMovieBtn.setBtnUI()
-        AddSaveMovieBtn.setTitle(isEditMode ? "Edit movie" : "Add movie", for: .normal)
+        AddSaveMovieBtn.setTitle(isEditMode ? Constants.Titles.createMovieViewControllerBtnTitleEditMovie : Constants.Titles.createMovieViewControllerBtnTitleAddMovie, for: .normal)
         
         setupPoster()
         setupTextFields()
         setupDatePicker()
         setupGenrePicker()
+        
+        if isEditMode {
+            setupEditMode()
+        }
+    }
+    
+    private func setupEditMode() {
+        guard let movie = movie else { return }
+        
+        poster.isUserInteractionEnabled = false
+        guard let imageData = movie.poster else { return }
+        poster.image = UIImage(data: imageData)
+        
+        titleField.isUserInteractionEnabled = false
+        titleField.backgroundColor = UIColor.gray
+        titleField.text = movie.title
+        
+        releaseYearField.isUserInteractionEnabled = false
+        releaseYearField.backgroundColor = UIColor.gray
+        releaseYearField.text = movie.releaseDate
     }
     
     @objc private func setImagePicker() {
@@ -139,9 +157,9 @@ class CreateMovieViewController: UIViewController {
         view.addSubview(containerView)
         
         UIView.animate(withDuration: 0.2) {
-             self.containerView.frame.origin.y = (self.view.frame.height -
-             pickerViewHeight)
-          }
+            self.containerView.frame.origin.y = (self.view.frame.height -
+                                                 pickerViewHeight)
+        }
         
         let customButton = UIButton(type: .custom)
         customButton.frame = CGRect(x: 0.0, y: 0.0, width: 50, height: 35)
@@ -163,7 +181,7 @@ class CreateMovieViewController: UIViewController {
     
     @objc private func dismissImagePicker() {
         UIView.animate(withDuration: 0.2) {
-           self.containerView.frame.origin.y = self.view.frame.height
+            self.containerView.frame.origin.y = self.view.frame.height
         }
     }
     
@@ -203,25 +221,27 @@ class CreateMovieViewController: UIViewController {
     
     private func setupPoster() {
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(setImagePicker))
-        poster.isUserInteractionEnabled = isEditMode ? false : true
+        
         poster.addGestureRecognizer(tapGestureRecognizer)
         poster.layer.borderWidth = 1.0
         poster.layer.borderColor = UIColor.lightGray.cgColor
     }
     
     private func setupTextFields() {
-        titleField.isUserInteractionEnabled = isEditMode ? false : true
-        titleField.setupTextFields(placeHolder: "Title")
+        titleField.setupTextFields(placeHolder: Constants.TextFieldsPlaceholders.titleField)
         titleField.delegate = self
         titleField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
-        releaseYearField.setupTextFields(placeHolder: "Release Year")
-        releaseYearField.isUserInteractionEnabled = isEditMode ? false : true
+        
+        releaseYearField.setupTextFields(placeHolder: Constants.TextFieldsPlaceholders.releaseYearField)
         releaseYearField.delegate = self
-        shortDescriptionField.setupTextFields(placeHolder: "Short Description")
+        
+        shortDescriptionField.setupTextFields(placeHolder: Constants.TextFieldsPlaceholders.shortDescriptionField)
         shortDescriptionField.delegate = self
         shortDescriptionField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
-        genreField.setupTextFields(placeHolder: "Genre")
+        
+        genreField.setupTextFields(placeHolder: Constants.TextFieldsPlaceholders.genreField)
         genreField.delegate = self
+        
         longDescriptionField.setupTextView()
         longDescriptionField.delegate = self
     }
@@ -238,6 +258,22 @@ class CreateMovieViewController: UIViewController {
                 let movement:CGFloat = ( up ? keyboardRect.height : 0)
                 self.scrollView.setContentOffset(CGPoint(x: 0, y: movement), animated: true)
             }
+        }
+    }
+    
+    private func addMovie() {
+        let _ = CoreDataManager.shared.addMovie(poster: (poster.image?.jpegData(compressionQuality: 1))!, title: titleField.text!, releaseDate: releaseYearField.text!, genre: genreField.text!, shortAbout: shortDescriptionField.text!, longAbout: longDescriptionField.text)
+        CoreDataManager.shared.save()
+        dismiss(animated: true) {
+            self.isDismissed?()
+        }
+    }
+    
+    private func validateFields() -> Bool {
+        if poster.image != nil && titleField.isMoreThanThree() && releaseYearField.text != nil && shortDescriptionField.isMoreThanThree() && genreField.text != nil && longDescriptionField.isMoreThanTen() {
+            return true
+        } else {
+            return false
         }
     }
     
@@ -273,7 +309,8 @@ extension CreateMovieViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         if pickerView == imagePicker {
             guard let imagePicker else { return }
-            let image: UIImage = UIImage(named: "\(posters[imagePicker.selectedRow(inComponent: 0)])")!
+            //            let image: UIImage = UIImage(named: "\(posters[imagePicker.selectedRow(inComponent: 0)])")!
+            guard let image: UIImage = UIImage(named: "\(Constants.AddMovie.posters[imagePicker.selectedRow(inComponent: 0)])") else { return }
             poster.image = image
         }
     }
@@ -286,20 +323,32 @@ extension CreateMovieViewController: UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         if pickerView == genrePicker {
-            return genres.count
+            //            return genres.count
+            return Constants.AddMovie.genres.count
         } else if pickerView == imagePicker {
-            return posters.count
+            //            return posters.count
+            return Constants.AddMovie.posters.count
         }
         return 1
     }
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         if pickerView == genrePicker {
-            return genres[row]
+            //            return genres[row]
+            return Constants.AddMovie.genres[row]
         } else if pickerView == imagePicker {
-            return posters[row]
+            //            return posters[row]
+            return Constants.AddMovie.posters[row]
         }
         return ""
     }
+    
+}
+
+extension CreateMovieViewController: MovieDetailsDelegate {
+    func movieData(movie: Movie) {
+        self.movie = movie
+    }
+    
     
 }

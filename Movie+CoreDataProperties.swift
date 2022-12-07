@@ -18,7 +18,7 @@ extension Movie {
 
     @NSManaged public var poster: Data?
     @NSManaged public var title: String?
-    @NSManaged public var releaseDate: Date?
+    @NSManaged public var releaseDate: String?
     @NSManaged public var genre: String?
     @NSManaged public var shortAbout: String?
     @NSManaged public var longAbout: String?

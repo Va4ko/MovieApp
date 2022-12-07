@@ -13,7 +13,7 @@ extension UITextField {
         layer.borderWidth = 1.0
         layer.borderColor = UIColor.lightGray.cgColor
         layer.masksToBounds = true
-        attributedPlaceholder = NSAttributedString(string: placeHolder, attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
+        attributedPlaceholder = NSAttributedString(string: placeHolder, attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
     }
     
     func isValid() -> Bool {

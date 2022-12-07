@@ -8,14 +8,16 @@
 import UIKit
 
 class MovieCollectionViewCell: UICollectionViewCell {
-
+    
     @IBOutlet weak var moviePoster: UIImageView!
     
-    let identifier = CellIdentifiers.MovieCollectionViewCell.rawValue
-        
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
     }
-
+    
+    func configureCell(movie: Movie) {
+        guard let imageData = movie.poster else { return }
+        moviePoster.image = UIImage(data: imageData)
+    }
+    
 }

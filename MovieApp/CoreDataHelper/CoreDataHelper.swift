@@ -12,8 +12,10 @@ class CoreDataManager {
     
     static let shared = CoreDataManager()
     
+    init(){}
+    
     lazy var persistentContainer: NSPersistentContainer = {
-        let container = NSPersistentContainer(name: "CoreDataRelationship")
+        let container = NSPersistentContainer(name: "MovieApp")
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
                 fatalError("Unresolved error \(error), \(error.userInfo)")
@@ -22,7 +24,7 @@ class CoreDataManager {
         return container
     }()
     
-    func movie(poster: Data, title: String, releaseDate: Date, genre: String, shortAbout: String, longAbout: String) -> Movie {
+    func addMovie(poster: Data, title: String, releaseDate: String, genre: String, shortAbout: String, longAbout: String) -> Movie {
         let movie = Movie(context: persistentContainer.viewContext)
         movie.poster = poster
         movie.title = title
@@ -33,17 +35,17 @@ class CoreDataManager {
         return movie
     }
     
-    func movies() -> [Movie] {
+    func fetchMovies() -> [Movie] {
         let request: NSFetchRequest<Movie> = Movie.fetchRequest()
-//        request.sortDescriptors = [NSSortDescriptor(key: "releaseDate", ascending: false)]
-        var fetchedSongs: [Movie] = []
+        request.sortDescriptors = [NSSortDescriptor(key: "releaseDate", ascending: true)]
+        var fetchedMovies: [Movie] = []
         
         do {
-            fetchedSongs = try persistentContainer.viewContext.fetch(request)
+            fetchedMovies = try persistentContainer.viewContext.fetch(request)
         } catch let error {
-            print("Error fetching songs \(error)")
+            print("Error fetching movies \(error)")
         }
-        return fetchedSongs
+        return fetchedMovies
     }
     
     // MARK: - Core Data Saving support
@@ -53,15 +55,13 @@ class CoreDataManager {
             do {
                 try context.save()
             } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nserror = error as NSError
                 fatalError("❗️Unresolved error \(nserror), \(nserror.userInfo)")
             }
         }
     }
     
-    func deleteSong(movie: Movie) {
+    func deleteMovie(movie: Movie) {
         let context = persistentContainer.viewContext
         context.delete(movie)
         save()

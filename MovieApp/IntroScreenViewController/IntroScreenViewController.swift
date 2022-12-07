@@ -15,13 +15,12 @@ class IntroScreenViewController: UIViewController {
     
     @IBAction func showMoviesBtnTapped(_ sender: Any) {
         let movieListViewController = MovieListViewController(nibName: "MovieListViewController", bundle: nil)
-        movieListViewController.title = "Movies"
+        movieListViewController.title = Constants.Titles.movieListViewControllerTitle
         self.navigationController?.pushViewController(movieListViewController, animated: true)
     }
     
     @IBAction func addMovieBtnTapped(_ sender: Any) {
         let createMovieViewController = CreateMovieViewController(nibName: "CreateMovieViewController", bundle: nil)
-        createMovieViewController.title = "Add"
         
         let navigationController = UINavigationController(rootViewController: createMovieViewController)
         present(navigationController, animated: true)
@@ -35,13 +34,12 @@ class IntroScreenViewController: UIViewController {
     private func setupUI() {
         
         showMoviesBtn.setBtnUI()
-        showMoviesBtn.setTitle("Show movies", for: .normal)
+        showMoviesBtn.setTitle(Constants.Titles.introScreenShowMoviesBtnTitle, for: .normal)
         
         addMovieBtn.setBtnUI()
-        addMovieBtn.setTitle("Add movie", for: .normal)
+        addMovieBtn.setTitle(Constants.Titles.introScreenAddMovieBtnTitle, for: .normal)
         
         mainImage.image = UIImage(named: "mainImage")
-        mainImage.contentMode = .scaleAspectFit
     }
     
 }

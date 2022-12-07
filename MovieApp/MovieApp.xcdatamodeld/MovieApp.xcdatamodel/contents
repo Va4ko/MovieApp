@@ -4,7 +4,7 @@
         <attribute name="genre" optional="YES" attributeType="String"/>
         <attribute name="longAbout" optional="YES" attributeType="String"/>
         <attribute name="poster" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
-        <attribute name="releaseDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="releaseDate" optional="YES" attributeType="String"/>
         <attribute name="shortAbout" optional="YES" attributeType="String"/>
         <attribute name="title" optional="YES" attributeType="String"/>
     </entity>
