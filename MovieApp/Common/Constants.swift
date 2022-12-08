@@ -31,7 +31,7 @@ public struct Constants {
     }
     
     public struct AlertMessages {
-        static let textFields = "Title field and Short description field must contain more than 3 characters. Long description field must contain more than 10. Please review!"
+        static let textFields = "All fields are required! Title field and Short description field must contain more than 3 characters. Long description field must contain more than 10. Please review!"
         static let movieDeletion = "Are you sure?"
     }
 }

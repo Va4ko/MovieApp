@@ -33,6 +33,8 @@ class MovieDetailsViewController: UIViewController {
         navigationItem.rightBarButtonItems = [delete, edit]
         
         setMovieInfo()
+        
+        longDescriptionView.setupTextView()
     }
     
     @objc func editMovie() {
@@ -46,6 +48,14 @@ class MovieDetailsViewController: UIViewController {
         
         navigationController?.pushViewController(editMovieViewController, animated: true)
         
+        editMovieViewController.isDismissed = { [weak self] in
+            CoreDataManager.shared.fetchMovies { movies in
+                MovieDataSource.shared.movies = movies
+                self?.setMovieInfo()
+            }
+            
+        }
+        
     }
     
     @objc func didTapCancelBtn() {
@@ -55,9 +65,10 @@ class MovieDetailsViewController: UIViewController {
     @objc func deleteMovie() {
         popAlert(message: Constants.AlertMessages.movieDeletion) {
             guard let movie = self.movie else { return }
-            CoreDataManager.shared.deleteMovie(movie: movie)
-            self.dismiss(animated: true) {
-                self.isDismissed?()
+            CoreDataManager.shared.deleteMovie(movie: movie) {
+                self.dismiss(animated: true) {
+                    self.isDismissed?()
+                }
             }
         }
     }

@@ -7,18 +7,12 @@
 
 import UIKit
 
-protocol MovieDetailsDelegate: AnyObject {
-    func movieData(movie: Movie)
-}
-
 enum CellIdentifiers: String {
     case MovieCollectionViewCell = "MovieCollectionViewCell"
     case AddMovieCollectionViewCell = "AddMovieCollectionViewCell"
 }
 
 class MovieListViewController: UICollectionViewController {
-    
-    private var movies: [Movie] = []
     
     weak var movieDelegate: MovieDetailsDelegate?
     
@@ -30,8 +24,6 @@ class MovieListViewController: UICollectionViewController {
         registerCells()
         
         setCollectionViewLayout()
-        
-        getMovies()
         
     }
     
@@ -55,10 +47,6 @@ class MovieListViewController: UICollectionViewController {
         
     }
     
-    private func getMovies() {
-        movies = CoreDataManager.shared.fetchMovies()
-    }
-    
     @objc func addMovie() {
         let createMovieViewController = CreateMovieViewController(nibName: "CreateMovieViewController", bundle: nil)
         
@@ -66,32 +54,42 @@ class MovieListViewController: UICollectionViewController {
         present(navigationController, animated: true)
         
         createMovieViewController.isDismissed = { [weak self] in
-            self?.movies = CoreDataManager.shared.fetchMovies()
-            self?.collectionView.reloadData()
+            CoreDataManager.shared.fetchMovies { movies in
+                MovieDataSource.shared.movies = movies
+                self?.collectionView.reloadData()
+            }
+            
         }
     }
     
     // MARK: UICollectionViewDataSource
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return movies.count + 1
+        guard let movies = MovieDataSource.shared.movies else { return 1 }
+        if movies.count < 6 {
+            return movies.count + 1
+        } else {
+            return 6
+        }
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         
-        if movies.isEmpty {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.AddMovieCollectionViewCell.rawValue, for: indexPath) as! AddMovieCollectionViewCell
-            return cell
-        } else if indexPath.item == movies.count {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.AddMovieCollectionViewCell.rawValue, for: indexPath) as! AddMovieCollectionViewCell
-            return cell
-        } else {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.MovieCollectionViewCell.rawValue, for: indexPath) as! MovieCollectionViewCell
-            let movie = movies[indexPath.item]
-            cell.configureCell(movie: movie)
-            return cell
+        if let movies = MovieDataSource.shared.movies {
+            if indexPath.item == movies.count {
+                navigationItem.rightBarButtonItem?.isEnabled = true
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.AddMovieCollectionViewCell.rawValue, for: indexPath) as! AddMovieCollectionViewCell
+                return cell
+            } else {
+                navigationItem.rightBarButtonItem?.isEnabled = false
+                let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CellIdentifiers.MovieCollectionViewCell.rawValue, for: indexPath) as! MovieCollectionViewCell
+                let movie = movies[indexPath.item]
+                cell.configureCell(movie: movie)
+                return cell
+            }
         }
         
+        return UICollectionViewCell()
     }
     
     // MARK: UICollectionViewDelegate
@@ -101,15 +99,20 @@ class MovieListViewController: UICollectionViewController {
         if collectionView.cellForItem(at: indexPath) is AddMovieCollectionViewCell {
             addMovie()
         } else {
+            guard let movies = MovieDataSource.shared.movies else { return }
             let movie = movies[indexPath.item]
             let movieDetailsViewController = MovieDetailsViewController(nibName: "MovieDetailsViewController", bundle: nil)
+            
             movieDelegate = movieDetailsViewController
             movieDelegate?.movieData(movie: movie)
+            
             let navigationController = UINavigationController(rootViewController: movieDetailsViewController)
             present(navigationController, animated: true)
             
             movieDetailsViewController.isDismissed = { [weak self] in
-                self?.movies = CoreDataManager.shared.fetchMovies()
+                CoreDataManager.shared.fetchMovies { movies in
+                    MovieDataSource.shared.movies = movies
+                }
                 self?.collectionView.reloadData()
             }
         }

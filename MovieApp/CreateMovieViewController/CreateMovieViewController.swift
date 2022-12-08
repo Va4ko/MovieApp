@@ -16,27 +16,29 @@ class CreateMovieViewController: UIViewController {
     @IBOutlet weak var genreField: UITextField!
     @IBOutlet weak var longDescriptionField: UITextView!
     @IBOutlet weak var AddSaveMovieBtn: UIButton!
-    
     @IBOutlet weak var scrollView: UIScrollView!
     
     @IBAction func addSaveBtnTapped(_ sender: Any) {
-        validateFields() ? addMovie() : popAlert(message: Constants.AlertMessages.textFields, onComplete: {
-        })
+        if isEditMode {
+            validateFields() ? saveMovie() : popAlert(message: Constants.AlertMessages.textFields, onComplete: {
+            })
+        } else {
+            validateFields() ? addMovie() : popAlert(message: Constants.AlertMessages.textFields, onComplete: {
+            })
+        }
     }
     
-    var keyboardRect: CGRect?
-    var imagePicker: UIPickerView?
-    var datePicker: UIDatePicker?
-    var genrePicker: UIPickerView?
+    private var movie: Movie?
+    private var keyboardRect: CGRect?
     private var containerView: UIView!
     var isEditMode: Bool = false
     var isDismissed: (() -> Void)?
-    
-    private var movie: Movie?
+    var imagePicker: UIPickerView?
+    var datePicker: UIDatePicker?
+    var genrePicker: UIPickerView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        NotificationCenter.default.addObserver(self, selector: #selector(handle(keyboardShowNotification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         
         setupUI()
         
@@ -48,14 +50,7 @@ class CreateMovieViewController: UIViewController {
     }
     
     @objc private func closeBtnTapped() {
-        dismiss(animated: true) {
-            
-        }
-    }
-    
-    @objc private func posterTapped(tapGestureRecognizer: UITapGestureRecognizer) {
-        
-        
+        dismiss(animated: true) {}
     }
     
     @objc private func handle(keyboardShowNotification notification: Notification) {
@@ -63,18 +58,6 @@ class CreateMovieViewController: UIViewController {
            let keyboardRectangle = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
             keyboardRect = keyboardRectangle
         }
-    }
-    
-    @objc private func textFieldDidChange(_ textField: UITextField) {
-        guard titleField.isValid(), shortDescriptionField.isValid() else {
-            print("Text Fields are not validated! ❌")
-            return
-        }
-        print("Text Fields are validated! ✅")
-    }
-    
-    @objc func textViewDidChange(_ textView: UITextView) {
-        
     }
     
     @objc private func dateDoneBtnPressed() {
@@ -91,22 +74,15 @@ class CreateMovieViewController: UIViewController {
     @objc private func genreDoneBtnPressed() {
         
         guard let genrePicker else { return }
-        //        genreField.text = genres[genrePicker.selectedRow(inComponent: 0)]
         genreField.text = Constants.AddMovie.genres[genrePicker.selectedRow(inComponent: 0)]
-        self.view.endEditing(true)
-    }
-    
-    @objc private func posterDoneBtnPressed() {
-        
-        guard let imagePicker else { return }
-        //        poster.image = UIImage(named: "\(posters[imagePicker.selectedRow(inComponent: 0)])")
-        poster.image = UIImage(named: "\(Constants.AddMovie.posters[imagePicker.selectedRow(inComponent: 0)])")
         self.view.endEditing(true)
     }
     
     private func setupUI() {
         
         self.title = isEditMode ? Constants.Titles.createMovieViewControllerTitleEditMovie : Constants.Titles.createMovieViewControllerTitleAddMovie
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(handle(keyboardShowNotification:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         
         navigationItem.leftBarButtonItem = isEditMode ? nil : UIBarButtonItem(barButtonSystemItem: .close, target: self, action: #selector(closeBtnTapped))
         
@@ -139,44 +115,39 @@ class CreateMovieViewController: UIViewController {
         releaseYearField.isUserInteractionEnabled = false
         releaseYearField.backgroundColor = UIColor.gray
         releaseYearField.text = movie.releaseDate
+        
+        shortDescriptionField.text = movie.shortAbout
+        
+        genreField.text = movie.genre
+        
+        longDescriptionField.text = movie.longAbout
     }
     
     @objc private func setImagePicker() {
-        
         imagePicker = UIPickerView()
         containerView = UIView()
         let pickerViewHeight = self.view.bounds.height / 3
         guard let imagePicker else { return }
         imagePicker.delegate = self
-        
-        
         imagePicker.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: pickerViewHeight)
         imagePicker.backgroundColor = UIColor.systemBackground
         containerView.frame = CGRect(x: 0, y: view.bounds.height, width: view.bounds.width, height: pickerViewHeight)
         containerView.addSubview(imagePicker)
         view.addSubview(containerView)
         
-        UIView.animate(withDuration: 0.2) {
-            self.containerView.frame.origin.y = (self.view.frame.height -
-                                                 pickerViewHeight)
-        }
-        
-        let customButton = UIButton(type: .custom)
-        customButton.frame = CGRect(x: 0.0, y: 0.0, width: 50, height: 35)
-        customButton.setTitle("Done", for: .normal)
-        customButton.setTitleColor(.systemBlue, for: .normal)
-        customButton.addTarget(self, action: #selector(dismissImagePicker), for: .touchUpInside)
-        let doneButton = UIBarButtonItem(customView: customButton)
+        let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: nil, action: #selector(dismissImagePicker))
         
         let doneToolbar = UIToolbar()
         doneToolbar.sizeToFit()
-        let spaceButton = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        doneToolbar.setItems([spaceButton, doneButton], animated: false)
+        doneToolbar.setItems([doneButton], animated: false)
         doneToolbar.isUserInteractionEnabled = true
         doneToolbar.frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: 35)
         doneToolbar.backgroundColor = .gray
         containerView.addSubview(doneToolbar)
         
+        UIView.animate(withDuration: 0.2) {
+            self.containerView.frame.origin.y = (self.view.frame.height - pickerViewHeight)
+        }
     }
     
     @objc private func dismissImagePicker() {
@@ -184,7 +155,6 @@ class CreateMovieViewController: UIViewController {
             self.containerView.frame.origin.y = self.view.frame.height
         }
     }
-    
     
     private func setupDatePicker() {
         datePicker = UIDatePicker()
@@ -195,9 +165,10 @@ class CreateMovieViewController: UIViewController {
         toolBar.sizeToFit()
         let doneBtn = UIBarButtonItem(barButtonSystemItem: .done, target: nil, action: #selector(dateDoneBtnPressed))
         toolBar.setItems([doneBtn], animated: true)
-        releaseYearField.inputAccessoryView = toolBar
         
+        releaseYearField.inputAccessoryView = toolBar
         releaseYearField.inputView = datePicker
+        
         datePicker.datePickerMode = .date
         datePicker.preferredDatePickerStyle = .wheels
         
@@ -223,6 +194,7 @@ class CreateMovieViewController: UIViewController {
         let tapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(setImagePicker))
         
         poster.addGestureRecognizer(tapGestureRecognizer)
+        
         poster.layer.borderWidth = 1.0
         poster.layer.borderColor = UIColor.lightGray.cgColor
     }
@@ -230,14 +202,12 @@ class CreateMovieViewController: UIViewController {
     private func setupTextFields() {
         titleField.setupTextFields(placeHolder: Constants.TextFieldsPlaceholders.titleField)
         titleField.delegate = self
-        titleField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
         
         releaseYearField.setupTextFields(placeHolder: Constants.TextFieldsPlaceholders.releaseYearField)
         releaseYearField.delegate = self
         
         shortDescriptionField.setupTextFields(placeHolder: Constants.TextFieldsPlaceholders.shortDescriptionField)
         shortDescriptionField.delegate = self
-        shortDescriptionField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: UIControl.Event.editingChanged)
         
         genreField.setupTextFields(placeHolder: Constants.TextFieldsPlaceholders.genreField)
         genreField.delegate = self
@@ -263,8 +233,22 @@ class CreateMovieViewController: UIViewController {
     
     private func addMovie() {
         let _ = CoreDataManager.shared.addMovie(poster: (poster.image?.jpegData(compressionQuality: 1))!, title: titleField.text!, releaseDate: releaseYearField.text!, genre: genreField.text!, shortAbout: shortDescriptionField.text!, longAbout: longDescriptionField.text)
-        CoreDataManager.shared.save()
-        dismiss(animated: true) {
+        
+        CoreDataManager.shared.save {
+            self.dismiss(animated: true) {
+                self.isDismissed?()
+            }
+        }
+    }
+    
+    private func saveMovie() {
+        guard let movie = movie else { return }
+        movie.shortAbout = shortDescriptionField.text
+        movie.genre = genreField.text
+        movie.longAbout = longDescriptionField.text
+        
+        CoreDataManager.shared.save {
+            self.navigationController?.popViewController(animated: true)
             self.isDismissed?()
         }
     }
@@ -289,7 +273,6 @@ extension CreateMovieViewController: UITextFieldDelegate {
     func textFieldDidEndEditing(_ textField: UITextField) {
         if textField == titleField || textField == releaseYearField || textField == shortDescriptionField || textField == genreField {
             animateViewMoving(up: false, additional: nil)
-            
         }
     }
     
@@ -309,7 +292,6 @@ extension CreateMovieViewController: UIPickerViewDelegate {
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         if pickerView == imagePicker {
             guard let imagePicker else { return }
-            //            let image: UIImage = UIImage(named: "\(posters[imagePicker.selectedRow(inComponent: 0)])")!
             guard let image: UIImage = UIImage(named: "\(Constants.AddMovie.posters[imagePicker.selectedRow(inComponent: 0)])") else { return }
             poster.image = image
         }
@@ -323,10 +305,8 @@ extension CreateMovieViewController: UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         if pickerView == genrePicker {
-            //            return genres.count
             return Constants.AddMovie.genres.count
         } else if pickerView == imagePicker {
-            //            return posters.count
             return Constants.AddMovie.posters.count
         }
         return 1
@@ -334,10 +314,8 @@ extension CreateMovieViewController: UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         if pickerView == genrePicker {
-            //            return genres[row]
             return Constants.AddMovie.genres[row]
         } else if pickerView == imagePicker {
-            //            return posters[row]
             return Constants.AddMovie.posters[row]
         }
         return ""
@@ -349,6 +327,5 @@ extension CreateMovieViewController: MovieDetailsDelegate {
     func movieData(movie: Movie) {
         self.movie = movie
     }
-    
     
 }

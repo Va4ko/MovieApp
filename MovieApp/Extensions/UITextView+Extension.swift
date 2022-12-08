@@ -16,19 +16,10 @@ extension UITextView {
         layer.backgroundColor = UIColor.white.cgColor
     }
     
-    func isValid() -> Bool {
-        guard let text = self.text, !text.isEmpty else {
-            print("Please fill the field.")
-            return false
-        }
-        return true
-    }
-    
     func isMoreThanTen() -> Bool {
         guard let text = self.text else { return false }
         
         if text.count < 10 {
-            print("Please enter more than 10 characters.")
             return false
         }
         return true

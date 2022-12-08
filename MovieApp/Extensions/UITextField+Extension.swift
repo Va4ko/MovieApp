@@ -16,19 +16,10 @@ extension UITextField {
         attributedPlaceholder = NSAttributedString(string: placeHolder, attributes: [NSAttributedString.Key.foregroundColor: UIColor.lightGray])
     }
     
-    func isValid() -> Bool {
-        guard let text = self.text, !text.isEmpty else {
-            print("Please fill the field.")
-            return false
-        }
-        return true
-    }
-    
     func isMoreThanThree() -> Bool {
         guard let text = self.text else { return false }
         
         if text.count < 3 {
-            print("Please enter more than 3 characters.")
             return false
         }
         return true

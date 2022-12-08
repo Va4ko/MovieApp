@@ -24,6 +24,10 @@ class IntroScreenViewController: UIViewController {
         
         let navigationController = UINavigationController(rootViewController: createMovieViewController)
         present(navigationController, animated: true)
+        
+        createMovieViewController.isDismissed = { [weak self] in
+            self?.getMovies()
+        }
     }
     
     override func viewDidLoad() {
@@ -31,8 +35,11 @@ class IntroScreenViewController: UIViewController {
         setupUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        getMovies()
+    }
+    
     private func setupUI() {
-        
         showMoviesBtn.setBtnUI()
         showMoviesBtn.setTitle(Constants.Titles.introScreenShowMoviesBtnTitle, for: .normal)
         
@@ -42,5 +49,19 @@ class IntroScreenViewController: UIViewController {
         mainImage.image = UIImage(named: "mainImage")
     }
     
+    private func getMovies() {
+        CoreDataManager.shared.fetchMovies { movies in
+            MovieDataSource.shared.movies = movies
+            self.dissableAddBtnIfNeeded()
+        }
+    }
+    
+    private func dissableAddBtnIfNeeded() {
+        if MovieDataSource.shared.movies?.count == 6 {
+            addMovieBtn.isEnabled = false
+        } else {
+            addMovieBtn.isEnabled = true
+        }
+    }
+    
 }
-

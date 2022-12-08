@@ -11,7 +11,7 @@ import CoreData
 class CoreDataManager {
     
     static let shared = CoreDataManager()
-    
+        
     init(){}
     
     lazy var persistentContainer: NSPersistentContainer = {
@@ -35,7 +35,7 @@ class CoreDataManager {
         return movie
     }
     
-    func fetchMovies() -> [Movie] {
+    func fetchMovies(completion: @escaping ([Movie]) -> Void) {
         let request: NSFetchRequest<Movie> = Movie.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: "releaseDate", ascending: true)]
         var fetchedMovies: [Movie] = []
@@ -45,11 +45,11 @@ class CoreDataManager {
         } catch let error {
             print("Error fetching movies \(error)")
         }
-        return fetchedMovies
+        completion(fetchedMovies)
     }
     
     // MARK: - Core Data Saving support
-    func save () {
+    func save (completion: @escaping () -> Void) {
         let context = persistentContainer.viewContext
         if context.hasChanges {
             do {
@@ -58,14 +58,16 @@ class CoreDataManager {
                 let nserror = error as NSError
                 fatalError("❗️Unresolved error \(nserror), \(nserror.userInfo)")
             }
+            completion()
         }
     }
     
-    func deleteMovie(movie: Movie) {
+    func deleteMovie(movie: Movie, completion: @escaping () -> Void) {
         let context = persistentContainer.viewContext
         context.delete(movie)
-        save()
+        save {
+            completion()
+        }
     }
-    
     
 }
